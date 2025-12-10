@@ -815,6 +815,18 @@ footer p {
     opacity: 0.8;
 }
 
+/* Rendre le lien de crédit (byMehd) bien visible en blanc */
+.footer-credits a {
+    color: white;
+    text-decoration: underline;
+}
+
+.footer-credits a:hover {
+    color: #ffffff;
+    opacity: 0.95;
+    text-decoration: none;
+}
+
 /* ============================================
    RESPONSIVE DESIGN
 ============================================ */
