@@ -253,6 +253,44 @@ sprite2.position.set(20, 160, 0);
 sprite2.scale.set(50, 100, 50);
 scene.add(sprite2);
 
+// PARTICLES SYSTEM
+const particleCount = 1500;
+const particlesGeometry = new THREE.BufferGeometry();
+const particlePositions = new Float32Array(particleCount * 3);
+
+for (let i = 0; i < particleCount; i++) {
+  particlePositions[i * 3] = (Math.random() - 0.5) * 3000;
+  particlePositions[i * 3 + 1] = Math.random() * 1000 - 200;
+  particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 3000;
+}
+
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+
+function createParticleTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32; canvas.height = 32;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+  grad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+  grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 32, 32);
+  return new THREE.CanvasTexture(canvas);
+}
+
+const particlesMaterial = new THREE.PointsMaterial({
+  color: 0xffffff,
+  size: 8,
+  map: createParticleTexture(),
+  transparent: true,
+  opacity: 0.4,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending
+});
+
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particles);
+
 // GUI
 const guiContainer = document.getElementById('guiContainer');
 const gui = new dat.GUI({ autoPlace: false });
@@ -328,6 +366,31 @@ function animate() {
     boat2.position.x = center2.x + radius2 * Math.cos(-t * speed2);
     boat2.position.z = center2.z + radius2 * Math.sin(-t * speed2);
     boat2.rotation.y = t * speed2;
+  }
+
+  // Animation Ciel / Sky
+  if (skySphere) {
+    skySphere.rotation.y += 0.0003;
+  }
+
+  // Animation Particules
+  if (particles) {
+    particles.rotation.y += 0.0002;
+    // Optional: add slight wave movement to particles
+    // const positions = particles.geometry.attributes.position.array;
+    // for(let i=0; i<particleCount; i++) {
+    //   positions[i*3+1] += Math.sin(t + positions[i*3]) * 0.1;
+    // }
+    // particles.geometry.attributes.position.needsUpdate = true; 
+  }
+
+  // Animation Sprites (Éléments flottants)
+  if (sprite) {
+    // Bobbing motion
+    sprite.position.y = 160 + Math.sin(t * 1.5) * 10;
+  }
+  if (sprite2) {
+    sprite2.position.y = 160 + Math.sin(t * 1.2 + 2) * 10;
   }
 
   renderer.render(scene, camera);
